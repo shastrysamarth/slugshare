@@ -1,41 +1,3 @@
----
-name: UCSC Dining Points Sharing App (Bare Minimum MVP)
-overview: "Build a minimal MVP Next.js app for UCSC students to share dining hall points. Core features only: Google OAuth login, points balance, create requests, view requests, accept/decline donations. Everything else can be added later."
-todos:
-  - id: setup
-    content: "✅ COMPLETE - Project initialized with Next.js, TypeScript, Tailwind, Prisma, NextAuth"
-    status: completed
-  - id: database_base
-    content: "✅ COMPLETE - NextAuth tables (User, Account, Session, VerificationToken) exist"
-    status: completed
-  - id: database_models
-    content: "Add Points and Request models to Prisma schema and run migration"
-    status: pending
-    dependencies:
-      - database_base
-  - id: auth_google
-    content: "Add Google OAuth provider to NextAuth (currently only has Credentials provider)"
-    status: pending
-    dependencies:
-      - database_base
-  - id: points
-    content: "Create points API endpoint and update dashboard to show balance"
-    status: pending
-    dependencies:
-      - database_models
-      - auth_google
-  - id: requests
-    content: "Create request system: form to create requests, page to list all requests"
-    status: pending
-    dependencies:
-      - points
-  - id: donations
-    content: "Add accept/decline functionality to requests, implement point transfer logic"
-    status: pending
-    dependencies:
-      - requests
----
-
 # UCSC Dining Points Sharing App - Bare Minimum MVP
 
 ## Architecture Overview
@@ -54,57 +16,77 @@ Minimal Next.js full-stack application with:
 ### ✅ Already Implemented
 
 1. **Project Setup**
-   - ✅ Next.js 16.1.1 with TypeScript
-   - ✅ Tailwind CSS v4 configured
-   - ✅ Prisma with PostgreSQL configured
-   - ✅ NextAuth.js v5 (beta) installed and configured
-   - ✅ shadcn/ui components set up
+
+- ✅ Next.js 16.1.1 with TypeScript
+- ✅ Tailwind CSS v4 configured
+- ✅ Prisma with PostgreSQL configured
+- ✅ NextAuth.js v5 (beta) installed and configured
+- ✅ shadcn/ui components set up
 
 2. **Authentication Infrastructure**
-   - ✅ NextAuth.js with Prisma adapter
-   - ✅ Credentials provider (email/password) working
-   - ✅ Login page at `/auth/login`
-   - ✅ Signup page at `/auth/signup`
-   - ✅ Dashboard page at `/dashboard` (protected)
-   - ✅ Session management working
-   - ✅ `auth.ts` - NextAuth configuration
-   - ✅ `auth.config.ts` - Auth config with Credentials provider
-   - ✅ `lib/auth.ts` - Auth utilities (`getCurrentUser()` helper)
-   - ✅ `lib/prisma.ts` - Prisma client
-   - ✅ `app/api/auth/[...nextauth]/route.ts` - Auth API route
+
+- ✅ NextAuth.js with Prisma adapter
+- ✅ Credentials provider (email/password) working
+- ✅ Google OAuth provider configured
+- ✅ Login page at `/auth/login` (with Google sign-in button)
+- ✅ Signup page at `/auth/signup`
+- ✅ Dashboard page at `/dashboard` (protected)
+- ✅ Session management working
+- ✅ `auth.ts` - NextAuth configuration
+- ✅ `auth.config.ts` - Auth config with Credentials and Google providers
+- ✅ `lib/auth.ts` - Auth utilities (`getCurrentUser()` helper)
+- ✅ `lib/prisma.ts` - Prisma client
+- ✅ `app/api/auth/[...nextauth]/route.ts` - Auth API route
 
 3. **Database**
-   - ✅ PostgreSQL connection configured
-   - ✅ NextAuth tables created (User, Account, Session, VerificationToken)
-   - ✅ Migrations run successfully
 
-### ❌ Still Needed for MVP
+- ✅ PostgreSQL connection configured
+- ✅ NextAuth tables created (User, Account, Session, VerificationToken)
+- ✅ Migrations run successfully
 
-1. **Google OAuth Provider** ⚠️ HIGH PRIORITY
-   - Add Google provider to `auth.config.ts`
-   - Set up Google OAuth credentials in `.env`
-   - (Optional) Update login page to include Google sign-in button
+### ✅ Completed for MVP
 
-2. **Database Models** ⚠️ HIGH PRIORITY
-   - Add `Points` model to Prisma schema
-   - Add `Request` model to Prisma schema
-   - Update `User` model to include relations
-   - Run migration: `npx prisma migrate dev --name add_points_and_requests`
+1. **Database Models** ✅
 
-3. **Points Feature**
-   - Create `app/api/points/route.ts` (GET and POST)
-   - Update `app/dashboard/page.tsx` to show points balance
-   - Allow users to set/update balance
+- ✅ Add `Points` model to Prisma schema
+- ✅ Add `Request` model to Prisma schema
+- ✅ Update `User` model to include relations
+- ✅ Run migration: `npx prisma migrate dev --name add_points_and_requests`
 
-4. **Requests Feature**
-   - Create `app/requests/create/page.tsx` (form)
-   - Create `app/requests/page.tsx` (list all requests)
-   - Create `app/api/requests/route.ts` (GET all, POST create)
+2. **Points Feature** ✅
 
-5. **Donations Feature**
-   - Create `app/api/requests/[id]/accept/route.ts`
-   - Create `app/api/requests/[id]/decline/route.ts`
-   - Implement point transfer logic with database transactions
+- ✅ Create `app/api/points/route.ts` (GET and POST)
+- ✅ Update `app/dashboard/page.tsx` to show points balance
+- ✅ Allow users to set/update balance (via UpdatePointsForm component)
+
+3. **Requests Feature** ✅
+
+- ✅ Create `app/requests/create/page.tsx` (form)
+- ✅ Create `app/requests/page.tsx` (list all requests)
+- ✅ Create `app/api/requests/route.ts` (GET all, POST create)
+- ✅ Create `lib/locations.ts` with UCSC dining locations
+
+4. **Donations Feature** ✅
+
+- ✅ Create `app/api/requests/[id]/accept/route.ts`
+- ✅ Create `app/api/requests/[id]/decline/route.ts`
+- ✅ Implement point transfer logic with database transactions
+- ✅ Add validation (sufficient balance, pending status, not own request)
+
+5. **Additional Features** ✅
+
+- ✅ Create `app/api/user/route.ts` for client-side user identification
+- ✅ All API routes protected with authentication
+- ✅ Input validation on all forms
+- ✅ Error handling throughout
+
+### ❌ Still Needed (Optional Enhancements)
+
+- ❌ Navbar component (mentioned in plan but not critical for MVP)
+- ❌ RequestCard component (currently using inline Card components)
+- ❌ Better error messages/toasts instead of alerts
+- ❌ Loading states improvements
+- ❌ Responsive design polish
 
 ## Database Schema (Minimal MVP)
 
@@ -112,7 +94,7 @@ Minimal Next.js full-stack application with:
 
 - `users`: Managed by NextAuth.js (id, email, name, image from Google)
 - `points`: id, user_id, balance (integer), updated_at
-  - Simple: one row per user, balance can be manually set initially
+- Simple: one row per user, balance can be manually set initially
 - `requests`: id, requester_id, donor_id (nullable), location (string), points_requested (integer), status (pending/accepted/declined), message (optional text), created_at, updated_at
 
 **Removed for MVP** (can add later):
@@ -159,14 +141,14 @@ Minimal Next.js full-stack application with:
 
 - **Files**: `app/requests/create/page.tsx`, `app/requests/page.tsx`, `app/api/requests/route.ts`
 - **Create Request Form**:
-  - Location input (text field or simple dropdown: C9/C10, Oakes Cafe, etc.)
-  - Points amount input
-  - Optional message field
+- Location input (text field or simple dropdown: C9/C10, Oakes Cafe, etc.)
+- Points amount input
+- Optional message field
 - **Requests List Page**:
-  - Show all pending requests
-  - Show request status (pending/accepted/declined)
-  - Simple card layout
-  - Manual refresh button (no auto-polling)
+- Show all pending requests
+- Show request status (pending/accepted/declined)
+- Simple card layout
+- Manual refresh button (no auto-polling)
 
 #### 4.3 Donation System
 
@@ -174,9 +156,9 @@ Minimal Next.js full-stack application with:
 - Accept button on request cards (only for pending requests)
 - Decline button on request cards
 - On accept:
-  - Transfer points: `donor.balance -= points_requested`, `requester.balance += points_requested`
-  - Update request status to "accepted"
-  - Set donor_id on request
+- Transfer points: `donor.balance -= points_requested`, `requester.balance += points_requested`
+- Update request status to "accepted"
+- Set donor_id on request
 - On decline: Update request status to "declined"
 
 ### 5. UI Components (Minimal)
@@ -221,40 +203,40 @@ flowchart TD
 
 1. **Points Balance**:
 
-   - Simple integer field in database
-   - Users can manually set initial balance via API or form
-   - No transaction history - just current balance
-   - Can add history/projections later
+- Simple integer field in database
+- Users can manually set initial balance via API or form
+- No transaction history - just current balance
+- Can add history/projections later
 
 2. **Request Flow**:
 
-   - Any logged-in user can create a request
-   - All requests visible to all users (potential donors)
-   - First user to click "Accept" gets it
-   - No filtering, no search - just a simple list
+- Any logged-in user can create a request
+- All requests visible to all users (potential donors)
+- First user to click "Accept" gets it
+- No filtering, no search - just a simple list
 
 3. **Point Transfer**:
 
-   - On accept: Atomic update of both balances in database transaction
-   - Validate donor has enough points before transfer
-   - Update request status and donor_id
+- On accept: Atomic update of both balances in database transaction
+- Validate donor has enough points before transfer
+- Update request status and donor_id
 
 4. **Security**:
 
-   - NextAuth.js handles OAuth security
-   - Protected API routes check NextAuth session
-   - Input validation on forms
-   - SQL injection prevention via Prisma
+- NextAuth.js handles OAuth security
+- Protected API routes check NextAuth session
+- Input validation on forms
+- SQL injection prevention via Prisma
 
 5. **No Auto-Updates**:
 
-   - Users manually refresh page to see new requests/updates
-   - Simplest possible - no polling, no WebSockets
-   - Can add auto-refresh later if needed
+- Users manually refresh page to see new requests/updates
+- Simplest possible - no polling, no WebSockets
+- Can add auto-refresh later if needed
 
 ## File Structure (MVP)
 
-```
+```javascript
 slugshare/
 ├── app/
 │   ├── api/
@@ -324,9 +306,7 @@ slugshare/
 - ✅ **No contact info**: Can add later
 - ✅ **Simple UI**: Functional, not polished
 
-This MVP can be built in ~2-3 days and provides a solid foundation to build upon.
-
----
+This MVP can be built in ~2-3 days and provides a solid foundation to build upon.---
 
 # Detailed Setup & Implementation Guide
 
@@ -342,6 +322,7 @@ Before starting, make sure everyone has:
 ## Step 1: Repository Setup (Already Done ✅)
 
 The repository is already initialized with:
+
 - Next.js 16.1.1
 - TypeScript
 - Tailwind CSS v4
@@ -376,11 +357,8 @@ GOOGLE_CLIENT_ID=""
 GOOGLE_CLIENT_SECRET=""
 ```
 
-**Note:** The repo uses `AUTH_SECRET` (not `NEXTAUTH_SECRET`) for NextAuth v5.
+**Note:** The repo uses `AUTH_SECRET` (not `NEXTAUTH_SECRET`) for NextAuth v5.**Getting your DATABASE_URL:If using Supabase:**
 
-**Getting your DATABASE_URL:**
-
-**If using Supabase:**
 1. Create account at [supabase.com](https://supabase.com)
 2. Create new project
 3. Go to Settings > Database
@@ -388,11 +366,13 @@ GOOGLE_CLIENT_SECRET=""
 5. Replace `[YOUR-PASSWORD]` with your database password
 
 **If using Neon:**
+
 1. Create account at [neon.tech](https://neon.tech)
 2. Create new project
 3. Copy the connection string from dashboard
 
 **If using local PostgreSQL:**
+
 - Format: `postgresql://postgres:YOUR_PASSWORD@localhost:5432/slugshare`
 - Replace `YOUR_PASSWORD` with your PostgreSQL password
 
@@ -400,9 +380,7 @@ GOOGLE_CLIENT_SECRET=""
 
 ### 2.1 Add Points and Request Models to Prisma Schema
 
-The schema already has NextAuth models. We need to add the Points and Request models.
-
-Open `prisma/schema.prisma` and add these models after the existing `VerificationToken` model:
+The schema already has NextAuth models. We need to add the Points and Request models.Open `prisma/schema.prisma` and add these models after the existing `VerificationToken` model:
 
 ```prisma
 // Points model - one row per user
@@ -518,6 +496,7 @@ npx prisma migrate dev --name add_points_and_requests
 ```
 
 This creates:
+
 - Points and Request tables in your PostgreSQL database
 - Migration files in `prisma/migrations/`
 
@@ -541,37 +520,36 @@ This generates TypeScript types for your database models (including the new Poin
 2. Create a new project (or select existing)
 3. Enable Google+ API:
 
-   - Go to "APIs & Services" > "Library"
-   - Search for "Google+ API" and enable it
+- Go to "APIs & Services" > "Library"
+- Search for "Google+ API" and enable it
 
 4. Create OAuth credentials:
 
-   - Go to "APIs & Services" > "Credentials"
-   - Click "Create Credentials" > "OAuth client ID"
-   - Application type: "Web application"
-   - Name: "SlugShare" (or any name)
-   - Authorized redirect URIs: `http://localhost:3000/api/auth/callback/google`
-   - Click "Create"
+- Go to "APIs & Services" > "Credentials"
+- Click "Create Credentials" > "OAuth client ID"
+- Application type: "Web application"
+- Name: "SlugShare" (or any name)
+- Authorized redirect URIs: `http://localhost:3000/api/auth/callback/google`
+- Click "Create"
 
 5. Copy the Client ID and Client Secret
 6. Add them to your `.env` file:
    ```env
-   GOOGLE_CLIENT_ID="your-client-id-here"
-   GOOGLE_CLIENT_SECRET="your-client-secret-here"
+            GOOGLE_CLIENT_ID="your-client-id-here"
+            GOOGLE_CLIENT_SECRET="your-client-secret-here"
    ```
 
 
 ## Step 4: Add Google Provider to Auth Config
 
 The repository already has:
+
 - ✅ `auth.ts` - NextAuth configuration with Prisma adapter
 - ✅ `auth.config.ts` - Auth config with Credentials provider
 - ✅ `app/api/auth/[...nextauth]/route.ts` - Auth API route
 - ✅ `lib/prisma.ts` - Prisma client
 
-**What we need to do:** Add Google OAuth provider to the existing `auth.config.ts`.
-
-Update `auth.config.ts`:
+**What we need to do:** Add Google OAuth provider to the existing `auth.config.ts`.Update `auth.config.ts`:
 
 ```typescript
 import type { NextAuthConfig } from "next-auth";
@@ -625,9 +603,7 @@ export const authConfig = {
 
 ## Step 5: Update Login Page (Optional)
 
-The login page at `app/auth/login/page.tsx` currently has Credentials login. You can add a "Sign in with Google" button.
-
-You can add it to the existing login form, or create a separate button. For NextAuth v5, use:
+The login page at `app/auth/login/page.tsx` currently has Credentials login. You can add a "Sign in with Google" button.You can add it to the existing login form, or create a separate button. For NextAuth v5, use:
 
 ```typescript
 import { signIn } from "@/auth"
@@ -710,96 +686,107 @@ The dashboard currently shows user email and name. We'll update it to show point
 Now that setup is complete, here are the features to implement:
 
 ### Task 1: Points API (GET and UPDATE)
-**File:** `app/api/points/route.ts`
 
-**Requirements:**
+**File:** `app/api/points/route.ts`**Requirements:**
+
 - GET: Return current user's points balance (create Points record if doesn't exist)
 - POST: Update current user's points balance
 - Protect routes (check session using `getCurrentUser()` from `lib/auth.ts`)
 - Validate input (balance must be >= 0)
 
 **Hints:**
+
 - Use `getCurrentUser()` from `lib/auth.ts` to get current user
 - Use `prisma` from `lib/prisma.ts` to query/update database
 - Return JSON responses
 - Use `prisma.points.upsert()` to get or create points record
 
 ### Task 2: Update Dashboard to Show Points
-**File:** `app/dashboard/page.tsx`
 
-**Requirements:**
+**File:** `app/dashboard/page.tsx`**Requirements:**
+
 - Display current points balance
 - Show links to create request and view requests
 - Get or create Points record for user on page load
 
 **Hints:**
+
 - Use `getCurrentUser()` to get user
 - Use `prisma.points.findUnique()` or `upsert()` to get points
 - Update the existing dashboard page (it already shows user info)
 
 ### Task 3: Create Request Form
-**File:** `app/requests/create/page.tsx`
 
-**Requirements:**
+**File:** `app/requests/create/page.tsx`**Requirements:**
+
 - Form with fields: location (dropdown or text), points (number), message (optional)
 - Submit to `/api/requests` POST endpoint
 - Show success/error messages
 - Redirect to requests list after creation
 
 **Hints:**
+
 - Use `'use client'` for form handling
 - Use `fetch()` to call API
 - Use Next.js `useRouter()` for navigation
 - Use shadcn/ui components (Button, Input, Card) that are already installed
 
 ### Task 4: Requests API
-**File:** `app/api/requests/route.ts`
 
-**Requirements:**
+**File:** `app/api/requests/route.ts`**Requirements:**
+
 - GET: Return all requests (with requester info)
 - POST: Create new request
 - Protect routes
 - Validate input
 
 **Hints:**
+
 - Use Prisma `include` to get related user data: `include: { requester: { select: { name, email } } }`
 - Sort by `createdAt` descending (newest first)
 - Use `getCurrentUser()` to get requester ID
 
 ### Task 5: Requests List Page
-**File:** `app/requests/page.tsx`
 
-**Requirements:**
+**File:** `app/requests/page.tsx`**Requirements:**
+
 - Display all requests in cards
 - Show: location, points, requester name, status, message
 - Show accept/decline buttons (only for pending requests, not user's own requests)
 - Don't show user's own requests (or show them differently)
 
 **Hints:**
+
 - Fetch from `/api/requests`
 - Use `'use client'` for interactivity
 - Style with Tailwind CSS and shadcn/ui Card component
 - Filter out user's own requests or mark them differently
 
 ### Task 6: Accept/Decline API
-**Files:** 
+
+**Files:**
+
 - `app/api/requests/[id]/accept/route.ts`
 - `app/api/requests/[id]/decline/route.ts`
 
 **Requirements:**
+
 - Accept: Transfer points, update request status, set donor_id
 - Decline: Update request status
 - Validate: Donor has enough points, request is pending, user is not requester
 - Use database transactions for atomicity
 
 **Hints:**
+
 - Use Prisma `$transaction()` for atomic updates
 - Check `request.status === 'pending'`
 - Check `donor.balance >= request.pointsRequested`
 - Update both Points records in the same transaction
 
 ### Task 7: Update Points Balance on Accept
+
 When a request is accepted:
+
 1. Decrease donor's balance
 2. Increase requester's balance
 3. Update request status to "accepted"
@@ -807,6 +794,7 @@ When a request is accepted:
 5. All in one database transaction
 
 **Example transaction:**
+
 ```typescript
 await prisma.$transaction([
   prisma.points.update({ where: { userId: donorId }, data: { balance: { decrement: points } } }),
@@ -879,9 +867,7 @@ Now that setup is complete, here are the features to implement:
 
 ### Task 1: Points API (GET and UPDATE)
 
-**File:** `app/api/points/route.ts`
-
-**Requirements:**
+**File:** `app/api/points/route.ts`**Requirements:**
 
 - GET: Return current user's points balance
 - POST: Update current user's points balance
@@ -896,9 +882,7 @@ Now that setup is complete, here are the features to implement:
 
 ### Task 2: Create Request Form
 
-**File:** `app/requests/create/page.tsx`
-
-**Requirements:**
+**File:** `app/requests/create/page.tsx`**Requirements:**
 
 - Form with fields: location (dropdown or text), points (number), message (optional)
 - Submit to `/api/requests` POST endpoint
@@ -913,9 +897,7 @@ Now that setup is complete, here are the features to implement:
 
 ### Task 3: Requests API
 
-**File:** `app/api/requests/route.ts`
-
-**Requirements:**
+**File:** `app/api/requests/route.ts`**Requirements:**
 
 - GET: Return all requests (with requester info)
 - POST: Create new request
@@ -929,9 +911,7 @@ Now that setup is complete, here are the features to implement:
 
 ### Task 4: Requests List Page
 
-**File:** `app/requests/page.tsx`
-
-**Requirements:**
+**File:** `app/requests/page.tsx`**Requirements:**
 
 - Display all requests in cards
 - Show: location, points, requester name, status, message
@@ -979,25 +959,25 @@ When a request is accepted:
 
 1. **Authentication:**
 
-   - ✅ Can sign in with Google
-   - ✅ Can sign out
-   - ✅ Protected pages redirect to login
+- ✅ Can sign in with Google
+- ✅ Can sign out
+- ✅ Protected pages redirect to login
 
 2. **Points:**
 
-   - ✅ Can view points balance
-   - ✅ Can update points balance
-   - ✅ Balance can't go negative
+- ✅ Can view points balance
+- ✅ Can update points balance
+- ✅ Balance can't go negative
 
 3. **Requests:**
 
-   - ✅ Can create a request
-   - ✅ Can view all requests
-   - ✅ Can't see own requests (or they're marked differently)
-   - ✅ Can accept a request (if has enough points)
-   - ✅ Can decline a request
-   - ✅ Points transfer correctly on accept
-   - ✅ Can't accept already accepted/declined requests
+- ✅ Can create a request
+- ✅ Can view all requests
+- ✅ Can't see own requests (or they're marked differently)
+- ✅ Can accept a request (if has enough points)
+- ✅ Can decline a request
+- ✅ Points transfer correctly on accept
+- ✅ Can't accept already accepted/declined requests
 
 ## Common Issues & Solutions
 
@@ -1041,7 +1021,3 @@ Once MVP is working, you can add:
 - [Next.js Docs](https://nextjs.org/docs)
 - [NextAuth.js Docs](https://next-auth.js.org/)
 - [Prisma Docs](https://www.prisma.io/docs)
-- [Tailwind CSS Docs](https://tailwindcss.com/docs)
-- [TypeScript Docs](https://www.typescriptlang.org/docs/)
-
-Good luck with your implementation!

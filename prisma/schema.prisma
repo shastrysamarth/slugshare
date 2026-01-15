@@ -20,6 +20,9 @@ model User {
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
+  points        Points?
+  requests      Request[] @relation("Requester")
+  donations     Request[] @relation("Donor")
 }
 
 model Account {
@@ -55,4 +58,28 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// Points model - one row per user
+model Points {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  balance   Int      @default(0)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  updatedAt DateTime  @updatedAt
+}
+
+// Request model
+model Request {
+  id             String   @id @default(cuid())
+  requesterId    String
+  donorId        String?
+  location       String
+  pointsRequested Int
+  status         String   @default("pending") // pending, accepted, declined
+  message        String?
+  requester      User     @relation("Requester", fields: [requesterId], references: [id])
+  donor          User?    @relation("Donor", fields: [donorId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
