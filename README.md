@@ -1,6 +1,6 @@
-# SlugShare Web Server
+# SlugShare - UCSC Dining Points Sharing App
 
-A Next.js application with authentication, built with NextAuth.js, Prisma, and shadcn/ui.
+A Next.js application for sharing dining hall points at UCSC, built with NextAuth.js, Prisma, and shadcn/ui.
 
 ## Prerequisites
 
@@ -37,6 +37,10 @@ DATABASE_URL="postgresql://user:password@localhost:5432/database_name?sslmode=re
 # NextAuth.js Secret
 # Generate a secret with: openssl rand -base64 32
 AUTH_SECRET="your-secret-key-here"
+
+# Google OAuth (for Google sign-in)
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
 ```
 
 **Optional Environment Variables:**
@@ -74,8 +78,10 @@ npx prisma migrate dev
 ```
 
 This will:
-- Create the database schema (User, Account, Session, VerificationToken tables)
+- Create the database schema (User, Account, Session, VerificationToken, Points, Request tables)
 - Generate the Prisma Client
+
+**Note:** After schema changes, always run `npx prisma generate` to update TypeScript types.
 
 ### 7. Start the Development Server
 
@@ -93,16 +99,28 @@ webserver/
 │   ├── auth/
 │   │   ├── login/          # Login page
 │   │   └── signup/         # Sign up page
-│   ├── dashboard/          # Protected dashboard page
+│   ├── dashboard/          # Protected dashboard page (shows points balance)
+│   ├── requests/
+│   │   ├── page.tsx        # Requests list page
+│   │   └── create/         # Create request page
 │   ├── actions/            # Server actions
-│   └── api/                # API routes
+│   └── api/
+│       ├── auth/           # NextAuth.js routes
+│       ├── points/         # Points API (GET, POST)
+│       ├── requests/        # Requests API (GET, POST)
+│       │   └── [id]/
+│       │       ├── accept/ # Accept request route
+│       │       └── decline/# Decline request route
+│       └── user/           # Current user API
 ├── components/
 │   ├── ui/                 # shadcn/ui components
-│   └── providers.tsx       # Session provider
+│   ├── providers.tsx       # Session provider
+│   └── UpdatePointsForm.tsx # Points update form
 ├── lib/
 │   ├── auth.ts             # Auth utilities
 │   ├── prisma.ts           # Prisma client
-│   └── utils.ts            # Utility functions
+│   ├── utils.ts            # Utility functions
+│   └── locations.ts        # UCSC dining locations
 ├── prisma/
 │   └── schema.prisma       # Database schema
 └── .env                    # Environment variables (create this)
@@ -124,31 +142,64 @@ webserver/
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 - `npx prisma migrate dev` - Run database migrations
+- `npx prisma generate` - Generate Prisma Client (run after schema changes)
 - `npx prisma studio` - Open Prisma Studio (database GUI)
 
-## Authentication
+## Features
 
-The application uses NextAuth.js with:
-
+### Authentication
 - **Credentials Provider** - Email/password authentication
+- **Google OAuth Provider** - Sign in with Google
 - **Prisma Adapter** - Stores sessions and accounts in the database
 - **JWT Sessions** - Token-based session management
 
-### Authentication Routes
+### Points Management
+- View current points balance on dashboard
+- Update points balance manually
+- Automatic points record creation on first access
 
+### Request System
+- Create requests for dining points (location, amount, optional message)
+- View all requests from other users
+- View your own requests with status tracking
+- Accept or decline requests from other users
+
+### Point Transfers
+- Atomic point transfers when accepting requests
+- Validation: sufficient balance, pending status, prevent self-acceptance
+- Automatic balance updates for both donor and requester
+
+## Routes
+
+### Pages
+- `/` - Home page (redirects to login)
 - `/auth/login` - Login page
 - `/auth/signup` - Sign up page
-- `/dashboard` - Protected dashboard (requires authentication)
-- `/api/auth/*` - NextAuth.js API routes
+- `/dashboard` - Protected dashboard (shows points balance)
+- `/requests` - All requests page (My Requests + Other Requests)
+- `/requests/create` - Create new request page
+
+### API Routes
+- `/api/auth/*` - NextAuth.js authentication routes
+- `/api/points` - GET (fetch balance), POST (update balance)
+- `/api/requests` - GET (all requests), POST (create request)
+- `/api/requests/[id]/accept` - POST (accept request and transfer points)
+- `/api/requests/[id]/decline` - POST (decline request)
+- `/api/user` - GET (current user info)
 
 ## Database Schema
 
 The Prisma schema includes:
 
+### NextAuth.js Models
 - **User** - User accounts
 - **Account** - OAuth account connections
 - **Session** - User sessions
 - **VerificationToken** - Email verification tokens
+
+### Application Models
+- **Points** - User point balances (one row per user)
+- **Request** - Point sharing requests (requester, donor, location, status)
 
 ## Getting Help
 
@@ -158,9 +209,23 @@ If you need help setting up the project, please contact the project maintainer w
 2. Your database setup (local PostgreSQL, cloud provider, etc.)
 3. Any error messages you're encountering
 
+## Google OAuth Setup
+
+To enable Google sign-in:
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing
+3. Enable Google+ API (APIs & Services > Library)
+4. Create OAuth credentials (APIs & Services > Credentials)
+   - Application type: Web application
+   - Authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
+5. Copy Client ID and Client Secret to `.env` file
+
 ## Notes
 
 - The `.env` file is gitignored - never commit it to version control
 - Make sure your database is running before starting the development server
 - The `AUTH_SECRET` should be a long, random string (at least 32 characters)
 - For production, use a secure database connection with SSL enabled
+- After modifying `prisma/schema.prisma`, run `npx prisma generate` to update TypeScript types
+- Run `npx prisma migrate dev` after schema changes to apply migrations

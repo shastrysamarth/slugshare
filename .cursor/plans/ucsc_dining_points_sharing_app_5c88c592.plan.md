@@ -199,6 +199,8 @@ flowchart TD
     DeclineAPI -->|Update Status| DB
 ```
 
+
+
 ## Key Implementation Details (MVP)
 
 1. **Points Balance**:
@@ -265,6 +267,8 @@ slugshare/
 │   └── index.ts
 └── package.json
 ```
+
+
 
 ## Development Phases (MVP)
 
@@ -535,9 +539,11 @@ This generates TypeScript types for your database models (including the new Poin
 5. Copy the Client ID and Client Secret
 6. Add them to your `.env` file:
    ```env
-            GOOGLE_CLIENT_ID="your-client-id-here"
-            GOOGLE_CLIENT_SECRET="your-client-secret-here"
+                  GOOGLE_CLIENT_ID="your-client-id-here"
+                  GOOGLE_CLIENT_SECRET="your-client-secret-here"
    ```
+
+
 
 
 ## Step 4: Add Google Provider to Auth Config
@@ -674,6 +680,8 @@ export default function SignInButton() {
 }
 ```
 
+
+
 - ✅ `app/auth/login/page.tsx` - Login page
 - ✅ `app/auth/signup/page.tsx` - Signup page  
 - ✅ `app/dashboard/page.tsx` - Dashboard (protected)
@@ -803,6 +811,8 @@ await prisma.$transaction([
 ])
 ```
 
+
+
 ## Step 8: Testing Your Implementation
 
 ```typescript
@@ -860,6 +870,8 @@ export default async function Dashboard() {
   )
 }
 ```
+
+
 
 ## Step 9: Implementation Tasks for Your Group
 
@@ -1019,5 +1031,3 @@ Once MVP is working, you can add:
 ## Resources
 
 - [Next.js Docs](https://nextjs.org/docs)
-- [NextAuth.js Docs](https://next-auth.js.org/)
-- [Prisma Docs](https://www.prisma.io/docs)
