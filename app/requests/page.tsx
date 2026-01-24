@@ -139,6 +139,58 @@ export default function RequestsPage() {
     }
   };
 
+  // Page.tsx delete function starts here ////
+  // This function is called when the user clicks the Delete button on one of their requests //
+  // requestId is The unique ID of the request to delete
+  const handleDelete = async (requestId: string) => {
+    // stops multiple delete operations from happening at the same time
+    // If ther is already a delete being processed then dont start another one
+    if (processingId) return;
+
+    // Show popup asking the user if theyre sure
+    // If they click "Cancel", confirm() returns false and exit
+    if (!confirm("Are you sure you want to delete this request?")) {
+      return; // User cancelled, so we stop here
+    }
+
+    try {
+      // Mark this request as being processed and shows "Deleting" on the button
+      setProcessingId(requestId);
+
+      // Send a DELETE request to our API endpoint
+      // This calls the DELETE function in app/api/requests/[id]/route.ts
+      const response = await fetch(`/api/requests/${requestId}`, {
+        method: "DELETE", // HTTP method tells the server we want to delete
+      });
+
+      // Parse the JSON response from the server
+      const data = await response.json();
+
+      // Check if the server returned an error
+      // response.ok is true if status code is 200-299, false otherwise
+      if (!response.ok) {
+        // Show the error message from the server
+        alert(data.error || "Failed to delete request");
+        return; // Stop here if there was an error
+      }
+
+      // If we get here then delete was successful
+      // refresh list of requests to show updated data
+      await fetchRequests(); // Re-fetch all requests from the API
+      router.refresh(); // Tell Next.js to refresh the page data
+    } catch (error) {
+      // If something unexpected goes wrong
+      console.error("Error deleting request:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      // run this code whether the delete succeeded or failed
+      // Clear the processing state so the button goes back to normal
+      setProcessingId(null);
+    }
+  };
+// page.tsx delete function ends here ////
+
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "accepted":
@@ -250,6 +302,24 @@ export default function RequestsPage() {
                             </p>
                           )}
 
+                          // Added delete button functionality to page.tsx starts here //
+                          {/* Only show the delete button if the request is still pending
+                          Once a request is accepted or declined it cant be deleted */}
+                          {request.status === "pending" && (
+                            <div className="flex gap-2">
+                              {/* Delete button - calls handleDelete when clicked */}
+                              <Button
+                                onClick={() => handleDelete(request.id)} // When clicked call handleDelete with this request's ID
+                                disabled={processingId === request.id} // Disable button while deleting to stop double clicks
+                                variant="destructive" // red button 
+                                size="sm" // Small button size
+                              >
+                                {/* Show "Deleting..." while processing otherwise show "Delete" */}
+                                {processingId === request.id ? "Deleting..." : "Delete"}
+                              </Button>
+                            </div>
+                          )}
+                          // Added delete button functionality to page.tsx ends here //
                           <p className="text-xs text-muted-foreground">
                             Created {new Date(request.createdAt).toLocaleString()}
                           </p>
