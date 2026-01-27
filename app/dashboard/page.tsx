@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { UpdatePointsForm } from "@/components/UpdatePointsForm";
@@ -41,9 +42,6 @@ export default async function DashboardPage() {
               await signOut({ redirectTo: "/auth/login" });
             }}
           >
-            <Button type="submit" variant="destructive">
-              Sign out
-            </Button>
           </form>
         </div>
 
