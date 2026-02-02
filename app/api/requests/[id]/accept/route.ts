@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { validateAcceptRequest } from "@/lib/validation";
 
 export async function POST(
   request: NextRequest,
@@ -23,29 +24,6 @@ export async function POST(
       },
     });
 
-    if (!request) {
-      return NextResponse.json(
-        { error: "Request not found" },
-        { status: 404 }
-      );
-    }
-
-    // Validate: Can't accept your own request
-    if (request.requesterId === user.id) {
-      return NextResponse.json(
-        { error: "You cannot accept your own request" },
-        { status: 400 }
-      );
-    }
-
-    // Validate: Request must be pending
-    if (request.status !== "pending") {
-      return NextResponse.json(
-        { error: "Request is no longer pending" },
-        { status: 400 }
-      );
-    }
-
     // Get or create donor's points
     const donorPoints = await prisma.points.upsert({
       where: { userId: user.id },
@@ -56,11 +34,12 @@ export async function POST(
       },
     });
 
-    // Validate: Donor must have enough points
-    if (donorPoints.balance < request.pointsRequested) {
+    // Validate the request can be accepted
+    const validation = validateAcceptRequest(request, user.id, donorPoints.balance);
+    if (!validation.valid) {
       return NextResponse.json(
-        { error: "Insufficient points balance" },
-        { status: 400 }
+        { error: validation.error },
+        { status: validation.status }
       );
     }
 

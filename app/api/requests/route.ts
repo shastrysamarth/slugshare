@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { validateCreateRequest } from "@/lib/validation";
 
 export async function GET() {
   try {
@@ -55,22 +56,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { location, pointsRequested, message } = body;
 
-    // Validate input
-    if (!location || typeof location !== "string" || location.trim().length === 0) {
+    const validation = validateCreateRequest({ location, pointsRequested });
+    if (!validation.valid) {
       return NextResponse.json(
-        { error: "Location is required" },
-        { status: 400 }
-      );
-    }
-
-    if (
-      typeof pointsRequested !== "number" ||
-      pointsRequested <= 0 ||
-      !Number.isInteger(pointsRequested)
-    ) {
-      return NextResponse.json(
-        { error: "Points requested must be a positive integer" },
-        { status: 400 }
+        { error: validation.error },
+        { status: validation.status }
       );
     }
 

@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { validateDeleteRequest } from "@/lib/validation";
 
 // This function handles DELETE HTTP requests
 // When a user clicks "Delete" on a request, this function runs
@@ -32,35 +33,16 @@ export async function DELETE(
       where: { id: requestId },
     });
 
-    // If the request doesn't exist, return an error (404 = Not Found)
-    if (!request) {
+    // Validate the request can be deleted
+    const validation = validateDeleteRequest(request, user.id);
+    if (!validation.valid) {
       return NextResponse.json(
-        { error: "Request not found" },
-        { status: 404 }
+        { error: validation.error },
+        { status: validation.status }
       );
     }
 
-    // Step 4: Security check - Make sure the user owns this request
-    // Only the person who created the request should be able to delete it
-    // requesterId is the ID of the user who created the request
-    if (request.requesterId !== user.id) {
-      return NextResponse.json(
-        { error: "You can only delete your own requests" },
-        { status: 403 } // 403 = Forbidden (you're logged in, but not allowed)
-      );
-    }
-
-    // Step 5: Business logic check - Only allow deleting pending requests
-    // We don't want users to delete requests that have already been accepted
-    // because points may have already been transferred
-    if (request.status !== "pending") {
-      return NextResponse.json(
-        { error: "You can only delete pending requests" },
-        { status: 400 } // 400 = Bad Request (invalid operation)
-      );
-    }
-
-    // Step 6: Actually delete the request from the database
+    // Step 4: Actually delete the request from the database
     // This removes the request record permanently
     await prisma.request.delete({
       where: { id: requestId },
